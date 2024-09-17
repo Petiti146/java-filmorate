@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.models.User;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -28,15 +29,15 @@ public class UserController {
     }
 
     @PostMapping
-    public User addUser(@RequestBody User newUser) {
+    public User addUser(@RequestBody @Valid User newUser) {
         if (newUser.getEmail() == null || !newUser.getEmail().contains("@")) {
             throw new ValidationException("Имейл пустой, либо в нем отсутствует знак <@>");
         }
         if (newUser.getLogin() == null || newUser.getLogin().contains(" ")) {
             throw new ValidationException("Логин не должен быть пустым и не должен содержать пробелы");
         }
-        if (newUser.getBirthday().isAfter(LocalDate.now())) {
-            throw new ValidationException("Ваша дата рождения указана не коректно");
+        if (newUser.getBirthday() == null || newUser.getBirthday().isAfter(LocalDate.now())) {
+            throw new ValidationException("Ваша дата рождения указана не коректно или не указана вовсе");
         }
 
         log.info("Adding new user: {}", newUser);
@@ -70,7 +71,7 @@ public class UserController {
         if (updatedUser.getLogin() == null || updatedUser.getLogin().contains(" ")) {
             throw new ValidationException("Логин не должен быть пустым и не должен содержать пробелы");
         }
-        if (updatedUser.getBirthday().isAfter(LocalDate.now())) {
+        if (updatedUser.getBirthday() == null || updatedUser.getBirthday().isAfter(LocalDate.now())) {
             throw new ValidationException("Ваша дата рождения указана не коректно");
         }
 

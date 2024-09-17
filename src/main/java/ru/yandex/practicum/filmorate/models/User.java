@@ -1,13 +1,18 @@
 package ru.yandex.practicum.filmorate.models;
 
-import java.time.LocalDate;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import java.time.LocalDate;
+
 @Data
-@EqualsAndHashCode(of = { "email" })
+@EqualsAndHashCode(of = {"email"})
 public class User {
     private Long id;
+    @NotBlank
+    @Email(message = "Invalid email format. Please provide a valid email address.")
     private String email;
     private String login;
     private String name;

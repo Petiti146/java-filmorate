@@ -32,14 +32,14 @@ public class FilmController {
         if (newFilm.getName() == null || newFilm.getName().isBlank()) {
             throw new ValidationException("Название фильма не может быть пустым");
         }
-        if (newFilm.getDescription().length() > 200) {
-            throw new ValidationException("Название фильма не может содержать больше 200 символов");
+        if (newFilm.getDescription().isBlank() || newFilm.getDescription().length() > 200) {
+            throw new ValidationException("Название фильма не может содержать больше 200 символов или быть пустым");
         }
-        if (LocalDate.of(1895, 12, 28).isAfter(newFilm.getReleaseDate())) {
-            throw new ValidationException("Дата релиза фильма не может быть раньше 1895 года");
+        if (newFilm.getReleaseDate() == null || LocalDate.of(1895, 12, 28).isAfter(newFilm.getReleaseDate())) {
+            throw new ValidationException("Дата релиза фильма не может быть раньше 1895 года или быть пустой");
         }
-        if (newFilm.getDuration() <= 0) {
-            throw new ValidationException("Продолжительность не может быть отрицательной");
+        if (newFilm.getDuration() == 0 || newFilm.getDuration() <= 0) {
+            throw new ValidationException("Продолжительность не может быть отрицательной или равняться нулю");
         }
 
         log.info("Adding new film: {}", newFilm);
@@ -60,11 +60,11 @@ public class FilmController {
         if (updatedFilm.getName() == null) {
             throw new ValidationException("Название фильма не может быть пустым");
         }
-        if (updatedFilm.getDescription().length() > 200) {
-            throw new ValidationException("Название фильма не может содержать больше 200 символов");
+        if (updatedFilm.getDescription() == null || updatedFilm.getDescription().length() > 200) {
+            throw new ValidationException("Название фильма не может содержать больше 200 символов или быть пустым");
         }
-        if (LocalDate.of(1895, 12, 28).isAfter(updatedFilm.getReleaseDate())) {
-            throw new ValidationException("Дата релиза фильма не может быть раньше 1895 года");
+        if (updatedFilm.getReleaseDate() == null || LocalDate.of(1895, 12, 28).isAfter(updatedFilm.getReleaseDate())) {
+            throw new ValidationException("Дата релиза фильма не может быть раньше 1895 года или быть пустой");
         }
         if (updatedFilm.getDuration() <= 0) {
             throw new ValidationException("Продолжительность не может быть отрицательнойл или пустой");
