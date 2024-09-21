@@ -2,9 +2,9 @@ package ru.yandex.practicum.filmorate.controllertests;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.controllers.UserController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.models.User;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,11 +15,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UserControllerTests {
 
-    private UserController userController;
+    private InMemoryUserStorage userController;
 
     @BeforeEach
     public void setUp() {
-        userController = new UserController();
+        userController = new InMemoryUserStorage();
     }
 
     @Test

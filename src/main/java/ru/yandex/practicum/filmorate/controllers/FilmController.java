@@ -1,82 +1,61 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.models.Film;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
-import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-@Slf4j
 @RestController
 @RequestMapping("/films")
+@Slf4j
 public class FilmController {
-    private Map<Long, Film> films = new HashMap<>();
-    private long idCounter = 1;
 
-    @GetMapping
-    public List<Film> getFilms() {
-        return films.values().stream().toList();
+    private final FilmStorage filmStorage;
+
+    @Autowired
+    public FilmController(FilmStorage filmStorage) {
+        this.filmStorage = filmStorage;
     }
 
     @PostMapping
-    public Film addFilm(@RequestBody Film newFilm) {
-        if (newFilm.getName() == null || newFilm.getName().isBlank()) {
-            throw new ValidationException("Название фильма не может быть пустым");
-        }
-        if (newFilm.getDescription().isBlank() || newFilm.getDescription().length() > 200) {
-            throw new ValidationException("Название фильма не может содержать больше 200 символов или быть пустым");
-        }
-        if (newFilm.getReleaseDate() == null || LocalDate.of(1895, 12, 28).isAfter(newFilm.getReleaseDate())) {
-            throw new ValidationException("Дата релиза фильма не может быть раньше 1895 года или быть пустой");
-        }
-        if (newFilm.getDuration() == 0 || newFilm.getDuration() <= 0) {
-            throw new ValidationException("Продолжительность не может быть отрицательной или равняться нулю");
-        }
-
-        log.info("Adding new film: {}", newFilm);
-        long id = getNextId();
-        newFilm.setId(id);
-        films.put(id, newFilm);
-        return newFilm;
+    public Film addFilm(@RequestBody Film film) {
+        return filmStorage.addFilm(film);
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film updatedFilm) {
-        if (updatedFilm.getId() == null) {
-            throw new ValidationException("Id должен быть указан");
-        }
-        if (films.get(updatedFilm.getId()) == null) {
-            throw new ValidationException("Фильма с таким id не существует");
-        }
-        if (updatedFilm.getName() == null) {
-            throw new ValidationException("Название фильма не может быть пустым");
-        }
-        if (updatedFilm.getDescription() == null || updatedFilm.getDescription().length() > 200) {
-            throw new ValidationException("Название фильма не может содержать больше 200 символов или быть пустым");
-        }
-        if (updatedFilm.getReleaseDate() == null || LocalDate.of(1895, 12, 28).isAfter(updatedFilm.getReleaseDate())) {
-            throw new ValidationException("Дата релиза фильма не может быть раньше 1895 года или быть пустой");
-        }
-        if (updatedFilm.getDuration() <= 0) {
-            throw new ValidationException("Продолжительность не может быть отрицательнойл или пустой");
-        }
-
-        log.info("Updating film with id: {}", updatedFilm.getId());
-        films.remove(updatedFilm.getId());
-        films.put(updatedFilm.getId(), updatedFilm);
-        return updatedFilm;
+    public Film updateFilm(@RequestBody Film film) {
+        return filmStorage.updateFilm(film);
     }
 
-    private long getNextId() {
-        return idCounter++;
+    @GetMapping
+    public List<Film> getFilms() {
+        return filmStorage.getFilms();
+    }
+
+    @GetMapping("/{id}")
+    public Film getFilm(@PathVariable long id) {
+        return filmStorage.getFilm(id);
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public void addLike(@PathVariable long id, @PathVariable long userId) {
+        filmStorage.addLike(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public void removeLike(@PathVariable long id, @PathVariable long userId) {
+        filmStorage.removeLike(id, userId);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getMostPopularFilms(@RequestParam(defaultValue = "10") int count) {
+        if (count < 1) {
+            count = 10;  // Если count отрицательное, задаём значение по умолчанию
+        }
+        return filmStorage.getMostPopularFilms(count);
     }
 }
