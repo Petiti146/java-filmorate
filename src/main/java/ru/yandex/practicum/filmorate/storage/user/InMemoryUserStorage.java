@@ -100,6 +100,7 @@ public class InMemoryUserStorage implements UserStorage {
 
         return userFriends.size();
     }
+
     @Override
     public List<User> getFriends(long userId) {
         User user = users.get(userId);

@@ -68,24 +68,16 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getMostPopularFilms(int count) {
-        // Если count не задан или меньше 1, задаем его значение на 10
         int limit = count > 0 ? count : 10;
-
-        // Получаем список фильмов
         List<Film> films = getFilms();
 
-        // Проверка, что список фильмов не пустой
+
         if (films == null || films.isEmpty()) {
             throw new NotFoundException("Фильмов нет");
         }
 
-        // Проверка, если фильмов меньше, чем запрошенный limit
         limit = Math.min(limit, films.size());
-
-        // Сортируем фильмы по количеству лайков (от большего к меньшему)
         films.sort((f1, f2) -> f2.getLikes().size() - f1.getLikes().size());
-
-        // Возвращаем первые 'limit' фильмов
         return films.subList(0, limit);
     }
 
