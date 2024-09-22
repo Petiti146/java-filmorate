@@ -57,9 +57,9 @@ public class FilmController {
     }
 
     @DeleteMapping("/{id}")//этого метода в тз нет, но лишним не будет
-    public void deleteFilm(@PathVariable long filmId) {// все еще обращаюсь к filmStorage, я тебе направил в пачке сообщение
-        filmStorage.deleteFilm(filmId);//по тз в film service только 3 метода, напиши по этому поводу
-    }//но прими проект если проблема будет лишь в этом пожалуйста, я поправлю как получу обратную связь
+    public void deleteFilm(@PathVariable long filmId) { // все еще обращаюсь к filmStorage, я тебе направил в пачке сообщение
+        filmStorage.deleteFilm(filmId); //по тз в film service только 3 метода, напиши по этому поводу
+    } //но прими проект если проблема будет лишь в этом пожалуйста, я поправлю как получу обратную связь
 
     @GetMapping("/popular")
     public List<Film> getMostPopularFilms(@RequestParam(defaultValue = "10") int count) {
