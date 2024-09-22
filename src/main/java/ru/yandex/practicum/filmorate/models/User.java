@@ -6,11 +6,14 @@ import lombok.EqualsAndHashCode;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(of = {"email"})
 public class User {
     private Long id;
+    private Set<Long> friends = new HashSet<>();
     @NotBlank
     @Email(message = "Invalid email format. Please provide a valid email address.")
     private String email;
