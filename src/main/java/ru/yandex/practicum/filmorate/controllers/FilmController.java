@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.models.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
