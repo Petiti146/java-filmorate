@@ -9,10 +9,8 @@ import ru.yandex.practicum.filmorate.models.User;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Component
 @Slf4j
@@ -21,37 +19,40 @@ public class InMemoryUserStorage implements UserStorage {
     private long idCounter = 1;
 
     @Override
-        public User addUser(User newUser) {
-            if (newUser.getEmail() == null || !newUser.getEmail().contains("@")) {
-                throw new ValidationException("Имейл пустой, либо в нем отсутствует знак <@>");
-            }
-            if (newUser.getLogin() == null || newUser.getLogin().contains(" ")) {
-                throw new ValidationException("Логин не должен быть пустым и не должен содержать пробелы");
-            }
-            if (newUser.getBirthday() == null || newUser.getBirthday().isAfter(LocalDate.now())) {
-                throw new ValidationException("Ваша дата рождения указана не коректно или не указана вовсе");
-            }
-
-            log.info("Adding new user: {}", newUser);
-
-            for (User user : users.values()) {
-                if (user.getEmail().equals(newUser.getEmail())) {
-                    throw new ValidationException("Этот имейл уже используется");
-                }
-            }
-            if (newUser.getName() == null) {
-                newUser.setName(newUser.getLogin());
-            }
-            long id = getNextId();
-            newUser.setId(id);
-            users.put(id, newUser);
-
-            return newUser;
+    public User addUser(User newUser) {
+        if (newUser.getEmail() == null || !newUser.getEmail().contains("@")) {
+            throw new ValidationException("Имейл пустой, либо в нем отсутствует знак <@>");
         }
+        if (newUser.getLogin() == null || newUser.getLogin().contains(" ")) {
+            throw new ValidationException("Логин не должен быть пустым и не должен содержать пробелы");
+        }
+        if (newUser.getBirthday() == null || newUser.getBirthday().isAfter(LocalDate.now())) {
+            throw new ValidationException("Ваша дата рождения указана не коректно или не указана вовсе");
+        }
+
+        log.info("Adding new user: {}", newUser);
+
+        for (User user : users.values()) {
+            if (user.getEmail().equals(newUser.getEmail())) {
+                throw new ValidationException("Этот имейл уже используется");
+            }
+        }
+        if (newUser.getName() == null) {
+            newUser.setName(newUser.getLogin());
+        }
+        long id = getNextId();
+        newUser.setId(id);
+        users.put(id, newUser);
+
+        return newUser;
+    }
 
     public void addFriend(long userId, long friendId) {
         if (users.get(userId) == null || users.get(friendId) == null) {
             throw new NotFoundException("User or friend not found");
+        }
+        if (userId == friendId) {
+            throw new ValidationException("Нельзя добавить в друзья самого себя");
         }
         User user = users.get(userId);
         User friend = users.get(friendId);
@@ -73,39 +74,6 @@ public class InMemoryUserStorage implements UserStorage {
             throw new NotFoundException("Пользователь с таким id не существует");
         }
         return users.get(id);
-    }
-
-    public List<User> getCommonFriends(long userId, long otherUserId) {
-        if (users.get(userId) == null || users.get(otherUserId) == null) {
-            throw new NotFoundException("Пользователь или другой пользователь не найден");
-        }
-
-        User user = users.get(userId);
-        User otherUser = users.get(otherUserId);
-
-        // Логируем идентификаторы друзей
-        System.out.println("User " + userId + " friends: " + user.getFriends());
-        System.out.println("User " + otherUserId + " friends: " + otherUser.getFriends());
-
-        Set<Long> userFriends = new HashSet<>(user.getFriends());
-        Set<Long> otherUserFriends = new HashSet<>(otherUser.getFriends());
-
-        // Пересечение множеств
-        userFriends.retainAll(otherUserFriends);
-
-        // Логируем результат пересечения
-        System.out.println("Common friends count: " + userFriends.size());
-
-        // Create a list of common friends
-        List<User> commonFriends = new ArrayList<>();
-        for (Long friendId : userFriends) {
-            User friend = users.get(friendId);
-            if (friend != null) {
-                commonFriends.add(friend);
-            }
-        }
-
-        return commonFriends;
     }
 
     @Override
