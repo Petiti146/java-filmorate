@@ -49,7 +49,6 @@ public class InMemoryUserStorage implements UserStorage {
             return newUser;
         }
 
-    @Override
     public void addFriend(long userId, long friendId) {
         if (users.get(userId) == null || users.get(friendId) == null) {
             throw new NotFoundException("User or friend not found");
@@ -71,13 +70,12 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User getUser(long id) {
         if (users.get(id) == null) {
-            throw new ValidationException("Пользователь с таким id не существует");
+            throw new NotFoundException("Пользователь с таким id не существует");
         }
         return users.get(id);
     }
 
-    @Override
-    public int getCommonFriends(long userId, long otherUserId) {
+    public List<User> getCommonFriends(long userId, long otherUserId) {
         if (users.get(userId) == null || users.get(otherUserId) == null) {
             throw new NotFoundException("Пользователь или другой пользователь не найден");
         }
@@ -98,7 +96,16 @@ public class InMemoryUserStorage implements UserStorage {
         // Логируем результат пересечения
         System.out.println("Common friends count: " + userFriends.size());
 
-        return userFriends.size();
+        // Create a list of common friends
+        List<User> commonFriends = new ArrayList<>();
+        for (Long friendId : userFriends) {
+            User friend = users.get(friendId);
+            if (friend != null) {
+                commonFriends.add(friend);
+            }
+        }
+
+        return commonFriends;
     }
 
     @Override
@@ -147,7 +154,6 @@ public class InMemoryUserStorage implements UserStorage {
         return users.remove(userId);
     }
 
-    @Override
     public void removeFriend(long userId, long friendId) {
         User user = users.get(userId);
         User friend = users.get(friendId);

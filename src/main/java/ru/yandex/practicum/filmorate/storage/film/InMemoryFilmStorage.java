@@ -1,12 +1,15 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.models.Film;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,9 +20,18 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     private Map<Long, Film> films = new HashMap<>();
     private long idCounter = 1;
+    private final InMemoryUserStorage inMemoryUserStorage;
+
+    @Autowired
+    public InMemoryFilmStorage(InMemoryUserStorage inMemoryUserStorage) {
+        this.inMemoryUserStorage = inMemoryUserStorage;
+    }
 
     @Override
     public Film addFilm(Film newFilm) {
+        if (newFilm == null) {
+            throw new ValidationException("Фильм не может быть null");
+        }
         if (newFilm.getName() == null || newFilm.getName().isBlank()) {
             throw new ValidationException("Название фильма не может быть пустым");
         }
@@ -33,17 +45,19 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new ValidationException("Продолжительность не может быть отрицательной или равняться нулю");
         }
 
-        log.info("Adding new film: {}", newFilm);
         long id = getNextId();
         newFilm.setId(id);
+        log.info("Adding new film: {}", newFilm);
         films.put(id, newFilm);
         return newFilm;
     }
 
-    @Override
     public void addLike(long filmId, long userId) {
         if (films.get(filmId) == null) {
-            throw new ValidationException("Фильма с таким id не существует");
+            throw new NotFoundException("Фильма с таким id не существует");
+        }
+        if (inMemoryUserStorage.getUser(userId) == null) {
+            throw new NotFoundException("Пользователя с таким id не существует");
         }
         Film film = films.get(filmId);
         if (film.getLikes().contains(userId)) {
@@ -66,19 +80,24 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.get(filmId);
     }
 
-    @Override
     public List<Film> getMostPopularFilms(int count) {
-        int limit = count > 0 ? count : 10;
+        log.debug("Проверка доходит ли до этого места", films);
         List<Film> films = getFilms();
-
-
-        if (films == null || films.isEmpty()) {
+        if (films == null) {
+            log.error("Films list is null");
+            throw new NotFoundException("Фильмов нет");
+        }
+        if (films.isEmpty()) {
+            log.error("Films list is empty");
             throw new NotFoundException("Фильмов нет");
         }
 
+        int limit = count > 0 ? count : 10;
         limit = Math.min(limit, films.size());
-        films.sort((f1, f2) -> f2.getLikes().size() - f1.getLikes().size());
-        return films.subList(0, limit);
+        List<Film> sortedFilms = new ArrayList<>(films);
+        sortedFilms.sort((f1, f2) -> f2.getLikes().size() - f1.getLikes().size());
+        log.debug("Films list: {}", sortedFilms);
+        return sortedFilms.subList(0, limit);
     }
 
     @Override
@@ -105,6 +124,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         log.info("Updating film with id: {}", updatedFilm.getId());
         films.remove(updatedFilm.getId());
         films.put(updatedFilm.getId(), updatedFilm);
+        log.info("Updating film with id: {}", updatedFilm);
         return updatedFilm;
     }
 
@@ -117,10 +137,12 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.remove(filmId);
     }
 
-    @Override
     public void removeLike(long filmId, long userId) {
         if (films.get(filmId) == null) {
-            throw new ValidationException("Фильма с таким id не существует");
+            throw new NotFoundException("Фильма с таким id не существует");
+        }
+        if (inMemoryUserStorage.getUser(userId) == null) {
+            throw new NotFoundException("Фильма с таким id не существует");
         }
         Film film = getFilm(filmId);
         film.getLikes().remove(userId);

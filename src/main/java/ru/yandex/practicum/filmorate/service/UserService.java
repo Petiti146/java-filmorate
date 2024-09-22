@@ -2,16 +2,16 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.models.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.util.List;
 
 @Service
 public class UserService {
 
-    private final UserStorage userStorage;
+    private final InMemoryUserStorage userStorage;
 
-    public UserService(UserStorage userStorage) {
+    public UserService(InMemoryUserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -23,11 +23,7 @@ public class UserService {
         userStorage.removeFriend(userId, friendId);
     }
 
-    public int getCommonFriends(long userId, long otherUserId) {
+    public List<User> getCommonFriends(long userId, long otherUserId) {
         return userStorage.getCommonFriends(userId, otherUserId);
-    }
-
-    public List<User> getFriends(Long id) {
-        return userStorage.getFriends(id);
     }
 }

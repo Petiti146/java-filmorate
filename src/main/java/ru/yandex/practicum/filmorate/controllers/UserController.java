@@ -4,11 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.models.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -16,10 +15,12 @@ import java.util.Map;
 public class UserController {
 
     private final UserStorage userStorage;
+    private final UserService userService;
 
     @Autowired
-    public UserController(UserStorage userStorage) {
+    public UserController(UserStorage userStorage, UserService userService) {
         this.userStorage = userStorage;
+        this.userService = userService;
     }
 
     @PostMapping
@@ -44,12 +45,12 @@ public class UserController {
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable long id, @PathVariable long friendId) {
-        userStorage.addFriend(id, friendId);
+        userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void removeFriend(@PathVariable long id, @PathVariable long friendId) {
-        userStorage.removeFriend(id, friendId);
+        userService.removeFriend(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
@@ -58,10 +59,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public Map<String, Integer> getCommonFriends(@PathVariable long id, @PathVariable long otherId) {
-        int commonFriends = userStorage.getCommonFriends(id, otherId);
-        Map<String, Integer> response = new HashMap<>();
-        response.put("commonFriends", commonFriends);
-        return response; // Возвращаем объект JSON с ключом "commonFriends"
+    public List<User> getCommonFriends(@PathVariable long id, @PathVariable long otherId) {
+        List<User> commonFriends = userService.getCommonFriends(id, otherId);
+        log.info("Возвращаем значение: {}", commonFriends.size());
+        return commonFriends;
     }
     }
