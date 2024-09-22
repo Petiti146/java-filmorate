@@ -1,22 +1,17 @@
 package ru.yandex.practicum.filmorate.controllertests;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.models.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FilmControllerTests {
     InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
-    @BeforeEach
-    public void setUp() {
-        InMemoryFilmStorage filmController = new InMemoryFilmStorage(inMemoryUserStorage);
-    }
 
     @Test
     public void testAddFilmValidationExceptionNameEmpty() {
