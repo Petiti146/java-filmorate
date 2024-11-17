@@ -21,6 +21,7 @@ public class FilmTests {
         assertEquals(description, film.getDescription());
         assertEquals(releaseDate, film.getReleaseDate());
         assertEquals(2000, film.getDuration());
+
     }
 
     @Test

@@ -13,13 +13,15 @@ import java.util.Set;
 @EqualsAndHashCode(of = {"email"})
 public class User {
     private Long id;
-    private Set<Long> friends = new HashSet<>();
     @NotBlank
     @Email(message = "Invalid email format. Please provide a valid email address.")
     private String email;
     private String login;
     private String name;
     private LocalDate birthday;
+    private Set<Long> friends = new HashSet<>();
+    private Set<Long> pendingFriendRequests = new HashSet<>();
+
 
     public User(String email, String login, String name, LocalDate birthday) {
         this.email = email;
