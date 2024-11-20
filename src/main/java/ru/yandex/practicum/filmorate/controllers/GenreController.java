@@ -1,52 +1,31 @@
-package ru.yandex.practicum.filmorate.controllers;
+package ru.yandex.practicum.filmorate.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.models.Genre;
-import ru.yandex.practicum.filmorate.service.genres.GenresService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.service.impl.GenreService;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/genres")
+@RequiredArgsConstructor
 public class GenreController {
 
-    private final GenresService genreService;
+    private final GenreService genreService;
 
-    @Autowired
-    public GenreController(GenresService genreService) {
-        this.genreService = genreService;
+    @GetMapping("/{id}")
+    public Genre getGenreById(@PathVariable Long id) {
+        return genreService.getGenreById(id);
     }
 
     @GetMapping
-    public ResponseEntity<List<Genre>> getAllGenres() {
-        List<Genre> genres = genreService.findAllGenres();
-        return ResponseEntity.ok(genres);
+    public List<Genre> getAllGenres() {
+        return genreService.getAllGenre();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Genre> getGenreById(@PathVariable Long id) {
-        Genre genre = genreService.findGenreById(id);
-        return ResponseEntity.ok(genre);
-    }
 
-    @PostMapping
-    public ResponseEntity<Genre> addGenre(@RequestBody Genre genre) {
-        Genre createdGenre = genreService.addGenre(genre);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdGenre);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Genre> updateGenre(@PathVariable Long id, @RequestBody Genre genre) {
-        Genre updatedGenre = genreService.updateGenre(id, genre);
-        return ResponseEntity.ok(updatedGenre);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteGenre(@PathVariable Long id) {
-        genreService.deleteGenre(id);
-        return ResponseEntity.noContent().build();
-    }
 }
