@@ -36,7 +36,7 @@ class UserControllerTests {
     void findAll() {
         UserDto user1 = UserDto.builder()
                 .id(1L)
-                .email("user1@example.com")
+                .email("user1@examplee.com")
                 .login("user1")
                 .name("User  One")
                 .birthday(LocalDate.of(2000, 1, 1))
