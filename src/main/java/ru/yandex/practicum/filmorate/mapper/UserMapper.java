@@ -29,13 +29,14 @@ public class UserMapper {
     }
 
     public static UserDto mapToUserDto(User user) {
-        UserDto dto = new UserDto();
-        dto.setId(user.getId());
-        dto.setLogin(user.getLogin());
-        dto.setEmail(user.getEmail());
-        dto.setName(user.getName());
-        dto.setBirthday(user.getBirthday());
-        dto.setFriends(user.getFriends());
-        return dto;
+
+        return UserDto.builder()
+                .id(user.getId())
+                .login(user.getLogin())
+                .email(user.getEmail())
+                .name(user.getName())
+                .birthday(user.getBirthday())
+                .friends(user.getFriends())
+                .build();
     }
 }

@@ -12,9 +12,9 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.GenresFilm;
 import ru.yandex.practicum.filmorate.model.Like;
 import ru.yandex.practicum.filmorate.repository.FilmRepository;
+import ru.yandex.practicum.filmorate.repository.GenresFilmRepository;
 import ru.yandex.practicum.filmorate.repository.LikeRepository;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
-import ru.yandex.practicum.filmorate.repository.GenresFilmRepository;
 
 import java.util.LinkedHashSet;
 import java.util.List;

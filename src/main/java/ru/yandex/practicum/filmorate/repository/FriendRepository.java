@@ -13,6 +13,8 @@ public interface FriendRepository {
     Optional<Friendship> findFriendById(Long userId, Long friendId);
 
     boolean delete(Long userId, Long friendId);
+
     Friendship updateFriendStatus(Long userId, Long friendId, boolean accept);
+
     List<Friendship> findMutualFriends(Long userId, Long friendId);
 }

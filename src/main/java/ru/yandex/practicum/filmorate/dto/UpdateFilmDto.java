@@ -13,22 +13,22 @@ public class UpdateFilmDto {
     private Integer duration;
 
     public boolean hasId() {
-        return ! (id == null || id <= 0);
+        return !(id == null || id <= 0);
     }
 
     public boolean hasName() {
-        return ! (name == null || name.isBlank());
+        return !(name == null || name.isBlank());
     }
 
     public boolean hasDescription() {
-        return ! (description == null || description.isBlank());
+        return !(description == null || description.isBlank());
     }
 
     public boolean hasReleaseDate() {
-        return ! (name == null);
+        return !(name == null);
     }
 
     public boolean hasDuration() {
-        return ! (duration == null || duration <= 0);
+        return !(duration == null || duration <= 0);
     }
 }

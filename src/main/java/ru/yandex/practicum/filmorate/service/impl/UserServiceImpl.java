@@ -12,13 +12,12 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.FriendRepository;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
 
-
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;

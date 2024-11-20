@@ -1,44 +1,47 @@
-//package ru.yandex.practicum.filmorate.modeltests;
-//
-//import org.junit.jupiter.api.Test;
-//import ru.yandex.practicum.filmorate.models.Film;
-//
-//import java.time.LocalDate;
-//
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//
-//public class FilmTests {
-//
-//    @Test
-//    public void testFilmConstructorWithNameDescriptionReleaseDateDuration() {
-//        String name = "Test Film";
-//        String description = "Test Description";
-//        LocalDate releaseDate = LocalDate.of(2021, 10, 1);
-//
-//        Film film = new Film(name, description, releaseDate, 2000);
-//
-//        assertEquals(name, film.getName());
-//        assertEquals(description, film.getDescription());
-//        assertEquals(releaseDate, film.getReleaseDate());
-//        assertEquals(2000, film.getDuration());
-//
-//    }
-//
-//    @Test
-//    public void testFilmConstructorWithIdNameDescriptionReleaseDateDuration() {
-//        Long id = 1L;
-//        String name = "Test Film";
-//        String description = "Test Description";
-//        LocalDate releaseDate = LocalDate.of(2021, 10, 1);
-//        int duration = 2222;
-//
-//        Film film = new Film(name, description, releaseDate, duration);
-//        film.setId(id);
-//
-//        assertEquals(id, film.getId());
-//        assertEquals(name, film.getName());
-//        assertEquals(description, film.getDescription());
-//        assertEquals(releaseDate, film.getReleaseDate());
-//        assertEquals(duration, film.getDuration());
-//    }
-//}
+package ru.yandex.practicum.filmorate.modeltests;
+
+import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.model.Film;
+
+import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+public class FilmTests {
+
+    @Test
+    void testFilmBuilder() {
+        Film film = Film.builder()
+                .id(1L)
+                .name("Film Name")
+                .description("Film Description")
+                .releaseDate(LocalDate.of(2020, 1, 1))
+                .duration(120)
+                .build();
+
+        assertNotNull(film);
+        assertEquals(1L, film.getId());
+        assertEquals("Film Name", film.getName());
+        assertEquals("Film Description", film.getDescription());
+        assertEquals(LocalDate.of(2020, 1, 1), film.getReleaseDate());
+        assertEquals(120, film.getDuration());
+    }
+
+    @Test
+    void testFilmGetters() {
+        Film film = Film.builder()
+                .id(1L)
+                .name("Film Name")
+                .description("Film Description")
+                .releaseDate(LocalDate.of(2020, 1, 1))
+                .duration(120)
+                .build();
+
+        assertEquals(1L, film.getId());
+        assertEquals("Film Name", film.getName());
+        assertEquals("Film Description", film.getDescription());
+        assertEquals(LocalDate.of(2020, 1, 1), film.getReleaseDate());
+        assertEquals(120, film.getDuration());
+    }
+}

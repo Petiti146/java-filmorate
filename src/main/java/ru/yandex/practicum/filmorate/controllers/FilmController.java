@@ -1,20 +1,21 @@
-package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.filmorate.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmDto;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.impl.FilmServiceImpl;
+
 import java.util.List;
 
 @RestController
@@ -47,7 +48,7 @@ public class FilmController {
 
     @GetMapping("/popular")
     public List<FilmDto> getMostPopularByNumberOfLikes(
-            @RequestParam(required = false, defaultValue =  DEFAULT_POPULAR_MOVIES_DISPLAYED_COUNT) Long count) {
+            @RequestParam(required = false, defaultValue = DEFAULT_POPULAR_MOVIES_DISPLAYED_COUNT) Long count) {
         return filmService.getMostPopularByNumberOfLikes(count);
     }
 

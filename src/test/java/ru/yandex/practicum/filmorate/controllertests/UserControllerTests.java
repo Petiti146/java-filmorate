@@ -1,61 +1,85 @@
-//package ru.yandex.practicum.filmorate.controllertests;
-//
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import ru.yandex.practicum.filmorate.exception.ValidationException;
-//import ru.yandex.practicum.filmorate.models.User;
-//
-//import java.time.LocalDate;
-//import java.util.List;
-//
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.junit.jupiter.api.Assertions.assertNotEquals;
-//import static org.junit.jupiter.api.Assertions.assertThrows;
-//
-//public class UserControllerTests {
-//
-//    private InMemoryUserStorage userController;
-//
-//    @BeforeEach
-//    public void setUp() {
-//        userController = new InMemoryUserStorage();
-//    }
-//
-//    @Test
-//    public void testAddUser() {
-//        User newUser = new User("test@example.com", "testuser", "Test User", LocalDate.of(1990, 1, 1));
-//        User addedUser = userController.addUser(newUser);
-//
-//        assertEquals(newUser, addedUser);
-//        List<User> users = userController.getUsers();
-//        assertEquals(1, users.size());
-//    }
-//
-//    @Test
-//    public void testAddUserValidation() {
-//        User invalidUser = new User(null, "testuser", "Test User", LocalDate.of(1990, 1, 1));
-//
-//        assertThrows(ValidationException.class, () -> userController.addUser(invalidUser));
-//    }
-//
-//    @Test
-//    public void testUpdateUser() {
-//        User newUser = new User("test@example.com", "testUser", "Test User", LocalDate.of(1990, 1, 1));
-//        userController.addUser(newUser);
-//
-//        User updatedUser = new User("test2@example.com", "updatedUser", "Updated User", LocalDate.of(1990, 1, 1));
-//        updatedUser.setId(1L);
-//        User updatedUserResult = userController.updateUser(updatedUser);
-//
-//        assertEquals(updatedUser, updatedUserResult);
-//        assertNotEquals("testuser", updatedUserResult.getLogin());
-//        assertEquals("Updated User", updatedUserResult.getName());
-//    }
-//
-//    @Test
-//    public void testUpdateUserValidation() {
-//        User invalidUser = new User(null, "testuser", "Test User", LocalDate.of(1990, 1, 1));
-//
-//        assertThrows(ValidationException.class, () -> userController.updateUser(invalidUser));
-//    }
-//}
+package ru.yandex.practicum.filmorate.controllertests;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.impl.UserServiceImpl;
+
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+class UserControllerTests {
+
+    @Mock
+    private UserServiceImpl userServiceImpl;
+
+    @InjectMocks
+    private UserController userController;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    void findAll() {
+        UserDto user1 = UserDto.builder()
+                .id(1L)
+                .email("user1@example.com")
+                .login("user1")
+                .name("User  One")
+                .birthday(LocalDate.of(2000, 1, 1))
+                .build();
+
+        UserDto user2 = UserDto.builder()
+                .id(2L)
+                .email("user2@example.com")
+                .login("user2")
+                .name("User  Two")
+                .birthday(LocalDate.of(2001, 1, 1))
+                .build();
+
+        when(userServiceImpl.getUsers()).thenReturn(Arrays.asList(user1, user2));
+
+        List<UserDto> users = userController.findAll();
+
+        assertEquals(2, users.size());
+        verify(userServiceImpl, times(1)).getUsers();
+    }
+
+    @Test
+    void create() {
+        User user = User.builder()
+                .email("newuser@example.com")
+                .login("newuser")
+                .name("New User")
+                .birthday(LocalDate.of(2023, 1, 1))
+                .build();
+
+        UserDto userDto = UserDto.builder()
+                .id(1L)
+                .email("newuser@example.com")
+                .login("newuser")
+                .name("New User")
+                .birthday(LocalDate.of(2023, 1, 1))
+                .build();
+
+        when(userServiceImpl.userCreate(user)).thenReturn(userDto);
+
+        UserDto createdUser = userController.create(user);
+
+        assertEquals(userDto, createdUser);
+        verify(userServiceImpl, times(1)).userCreate(user);
+    }
+}

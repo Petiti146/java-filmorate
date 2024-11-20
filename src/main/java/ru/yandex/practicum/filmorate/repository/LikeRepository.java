@@ -11,5 +11,6 @@ public interface LikeRepository {
     List<Like> getLikesByUserId(Long id);
 
     Like addLikeToFilm(Long filmId, Long userId);
+
     void deleteLike(Long filmId, Long userId);
 }

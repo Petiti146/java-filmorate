@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service.impl;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmDto;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
 
