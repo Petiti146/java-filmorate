@@ -2,61 +2,104 @@ package ru.yandex.practicum.filmorate.controllertests;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.models.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ru.yandex.practicum.filmorate.controllers.UserController;
+import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.service.impl.UserServiceImpl;
 
 import java.time.LocalDate;
-import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class UserControllerTests {
+@JdbcTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+class UserControllerTests {
 
-    private InMemoryUserStorage userController;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    private MockMvc mockMvc;
+    private UserServiceImpl userService;
 
     @BeforeEach
-    public void setUp() {
-        userController = new InMemoryUserStorage();
+    void setup() {
+        userService = Mockito.mock(UserServiceImpl.class);
+        UserController userController = new UserController(userService);
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+
+        // Создание таблиц
+        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS users (" +
+                "user_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY," +
+                "email VARCHAR NOT NULL UNIQUE," +
+                "login VARCHAR NOT NULL," +
+                "name VARCHAR," +
+                "birthday DATE NOT NULL)");
     }
 
     @Test
-    public void testAddUser() {
-        User newUser = new User("test@example.com", "testuser", "Test User", LocalDate.of(1990, 1, 1));
-        User addedUser = userController.addUser(newUser);
+    void testCreateUser() throws Exception {
+        UserDto userDto = UserDto.builder()
+                .email("test@example.com")
+                .login("testuser")
+                .name("Test User")
+                .birthday(LocalDate.of(1990, 1, 1))
+                .build();
 
-        assertEquals(newUser, addedUser);
-        List<User> users = userController.getUsers();
-        assertEquals(1, users.size());
+        when(userService.userCreate(any())).thenReturn(userDto);
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"test@example.com\",\"login\":\"testuser\",\"name\":\"Test User\",\"birthday\":\"1990-01-01\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.login").value("testuser"));
     }
 
     @Test
-    public void testAddUserValidation() {
-        User invalidUser = new User(null, "testuser", "Test User", LocalDate.of(1990, 1, 1));
+    void testGetUserById() throws Exception {
+        UserDto userDto = UserDto.builder()
+                .id(1L)
+                .email("test@example.com")
+                .login("testuser")
+                .name("Test User")
+                .birthday(LocalDate.of(1990, 1, 1))
+                .build();
 
-        assertThrows(ValidationException.class, () -> userController.addUser(invalidUser));
+        when(userService.getUserById(1L)).thenReturn(userDto);
+
+        mockMvc.perform(get("/users/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.login").value("testuser"));
     }
 
     @Test
-    public void testUpdateUser() {
-        User newUser = new User("test@example.com", "testUser", "Test User", LocalDate.of(1990, 1, 1));
-        userController.addUser(newUser);
+    void testUpdateUser() throws Exception {
+        UserDto userDto = UserDto.builder()
+                .id(1L)
+                .email("test@example.com")
+                .login("testuser")
+                .name("Updated User")
+                .birthday(LocalDate.of(1990, 1, 1))
+                .build();
 
-        User updatedUser = new User("test2@example.com", "updatedUser", "Updated User", LocalDate.of(1990, 1, 1));
-        updatedUser.setId(1L);
-        User updatedUserResult = userController.updateUser(updatedUser);
+        when(userService.userUpdate(any())).thenReturn(userDto);
 
-        assertEquals(updatedUser, updatedUserResult);
-        assertNotEquals("testuser", updatedUserResult.getLogin());
-        assertEquals("Updated User", updatedUserResult.getName());
-    }
-
-    @Test
-    public void testUpdateUserValidation() {
-        User invalidUser = new User(null, "testuser", "Test User", LocalDate.of(1990, 1, 1));
-
-        assertThrows(ValidationException.class, () -> userController.updateUser(invalidUser));
+        mockMvc.perform(put("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\":1,\"email\":\"test@example.com\",\"login\":\"testuser\",\"name\":\"Updated User\",\"birthday\":\"1990-01-01\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Updated User"));
     }
 }
