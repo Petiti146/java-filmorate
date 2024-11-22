@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.UpdateUserDto;
@@ -33,8 +34,11 @@ public class UserServiceImpl implements UserService {
         return createUserDtoWithFriends(user); // Возвращаем пользователя с друзьями
     }
 
-    public UserDto userCreate(User user) {
-        return UserMapper.mapToUserDto(userRepository.userCreate(user));
+    public UserDto userCreate(@Valid UserDto user) {
+        //return UserMapper.toUser(userRepository.userCreate(user));
+        User userDto = UserMapper.toUser(user); // Преобразование UserDto в User
+        User user2  = userRepository.userCreate(userDto); // Сохранение нового пользователя
+        return UserMapper.mapToUserDto(user2);
     }
 
     public UserDto userUpdate(UpdateUserDto request) {
@@ -48,7 +52,7 @@ public class UserServiceImpl implements UserService {
     public UserDto friending(Long userId, Long friendId) {
         UserDto response = UserMapper.mapToUserDto(findUserById(userId));
         findUserById(friendId);
-        List<Friendship> userList = friendRepository.findAllFriends(userId);
+        List<Friendship> userList = friendRepository.findAllFriends(friendId);
         List<Friendship> friendList = friendRepository.findAllFriends(userId);
         if (checkFriendshipExists(userList, userId, friendId)) {
             throw new InternalServerException("Пользователь с id: " + userId + " уже добавлял пользователя с id: "

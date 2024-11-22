@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmDto;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.impl.FilmServiceImpl;
 
 import java.util.List;
@@ -32,7 +31,7 @@ public class FilmController {
     }
 
     @PostMapping
-    public FilmDto create(@Valid @RequestBody Film film) {
+    public FilmDto create(@Valid @RequestBody FilmDto film) {
         return filmService.createFilm(film);
     }
 

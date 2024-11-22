@@ -39,4 +39,16 @@ public class FilmMapper {
                 .genres(film.getGenres())
                 .build();
     }
+
+    public static Film toFilm(FilmDto film) {
+        return Film.builder()
+                .id(film.getId())
+                .name(film.getName())
+                .description(film.getDescription())
+                .duration(film.getDuration())
+                .releaseDate(film.getReleaseDate())
+                .mpa(film.getMpa())
+                .genres(film.getGenres())
+                .build();
+    }
 }

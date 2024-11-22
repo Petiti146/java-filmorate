@@ -39,4 +39,14 @@ public class UserMapper {
                 .friends(user.getFriends())
                 .build();
     }
+
+    public static User toUser(UserDto userDto) {
+        return User.builder()
+                .id(userDto.getId())
+                .login(userDto.getLogin())
+                .email(userDto.getEmail())
+                .name(userDto.getName())
+                .birthday(userDto.getBirthday())
+                .build();
+    }
 }

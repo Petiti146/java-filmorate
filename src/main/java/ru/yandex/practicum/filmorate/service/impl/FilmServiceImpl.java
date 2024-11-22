@@ -33,9 +33,10 @@ public class FilmServiceImpl implements FilmService {
         return filmRepository.getFilms().stream().map(FilmMapper::toFilmDto).map(this::addGenresToFilmDto).toList();
     }
 
-    public FilmDto createFilm(Film film) {
-        Film newFilm = filmRepository.createFilm(film);
-        addGenresToGenresFilm(newFilm.getId(), newFilm.getGenres());
+    public FilmDto createFilm(FilmDto film) {
+        Film filmDto = FilmMapper.toFilm(film); // Преобразование UserDto в User
+        Film newFilm = filmRepository.createFilm(filmDto);
+        addGenresToGenresFilm(newFilm.getId(), newFilm.getGenres());// Сохранение нового пользователя
         return FilmMapper.toFilmDto(newFilm);
     }
 

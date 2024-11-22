@@ -31,10 +31,4 @@ public class User {
 
     private final List<Long> friends = new ArrayList<>();
 
-    public String getName() {
-        if (name == null) {
-            return login;
-        }
-        return name;
-    }
 }

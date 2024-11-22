@@ -1,85 +1,58 @@
 package ru.yandex.practicum.filmorate.controllertests;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.dto.UserDto;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.impl.UserServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
+@JdbcTest
+@AutoConfigureTestDatabase
 class UserControllerTests {
 
-    @Mock
-    private UserServiceImpl userServiceImpl;
+    @Autowired
+    private MockMvc mockMvc;
 
-    @InjectMocks
-    private UserController userController;
+    @Test
+    void testCreateUser() throws Exception {
+        String userJson = "{\"email\":\"user@example.com\",\"login\":\"user\",\"name\":\"User  Name\",\"birthday\":\"2000-01-01\"}";
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("user@example.com"));
     }
 
     @Test
-    void findAll() {
-        UserDto user1 = UserDto.builder()
-                .id(1L)
-                .email("user1@examplee.com")
-                .login("user1")
-                .name("User  One")
-                .birthday(LocalDate.of(2000, 1, 1))
-                .build();
-
-        UserDto user2 = UserDto.builder()
-                .id(2L)
-                .email("user2@example.com")
-                .login("user2")
-                .name("User  Two")
-                .birthday(LocalDate.of(2001, 1, 1))
-                .build();
-
-        when(userServiceImpl.getUsers()).thenReturn(Arrays.asList(user1, user2));
-
-        List<UserDto> users = userController.findAll();
-
-        assertEquals(2, users.size());
-        verify(userServiceImpl, times(1)).getUsers();
+    void testGetUserById() throws Exception {
+        mockMvc.perform(get("/users/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
-    void create() {
-        User user = User.builder()
-                .email("newuser@example.com")
-                .login("newuser")
-                .name("New User")
-                .birthday(LocalDate.of(2023, 1, 1))
-                .build();
+    void testUpdateUser() throws Exception {
+        String updateUserJson = "{\"id\":1,\"email\":\"updated@example.com\",\"login\":\"user\",\"name\":\"Updated User\",\"birthday\":\"2000-01-01\"}";
 
-        UserDto userDto = UserDto.builder()
-                .id(1L)
-                .email("newuser@example.com")
-                .login("newuser")
-                .name("New User")
-                .birthday(LocalDate.of(2023, 1, 1))
-                .build();
+        mockMvc.perform(put("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateUserJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("updated@example.com"));
+    }
 
-        when(userServiceImpl.userCreate(user)).thenReturn(userDto);
-
-        UserDto createdUser = userController.create(user);
-
-        assertEquals(userDto, createdUser);
-        verify(userServiceImpl, times(1)).userCreate(user);
+    @Test
+    void testUnfriending() throws Exception {
+        mockMvc.perform(delete("/users/1/friends/2"))
+                .andExpect(status().isOk());
     }
 }

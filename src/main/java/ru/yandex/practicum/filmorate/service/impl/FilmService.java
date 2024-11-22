@@ -2,14 +2,13 @@ package ru.yandex.practicum.filmorate.service.impl;
 
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmDto;
-import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
 
 public interface FilmService {
     List<FilmDto> getFilms();
 
-    FilmDto createFilm(Film film);
+    FilmDto createFilm(FilmDto film);
 
     FilmDto updateFilm(UpdateFilmDto request);
 
